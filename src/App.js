@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState} from "react";
 
 import {
   SafeAreaView,
@@ -11,6 +11,11 @@ import {
 } from "react-native";
 
 export default function App() {
+  const [repos, setRepos] = useState([]);
+  useEffect(() => {
+    api.get('repositories').then(result => { setRepos(result.data) });
+  }, []);
+
   async function handleLikeRepository(id) {
     // Implement "Like Repository" functionality
   }
@@ -19,10 +24,13 @@ export default function App() {
     <>
       <StatusBar barStyle="light-content" backgroundColor="#7159c1" />
       <SafeAreaView style={styles.container}>
-        <View style={styles.repositoryContainer}>
-          <Text style={styles.repository}>Repository 1</Text>
-
-          <View style={styles.techsContainer}>
+        <FlatList
+          style={styles.repositoryContainer}
+          data={repos}
+          keyExtractor={repo => repo.id}
+          renderItem={({ item }) => (
+            <Text style={styles.repository}>{item.title}</Text>
+            <View style={styles.techsContainer}>
             <Text style={styles.tech}>
               ReactJS
             </Text>
@@ -49,7 +57,8 @@ export default function App() {
           >
             <Text style={styles.buttonText}>Curtir</Text>
           </TouchableOpacity>
-        </View>
+          )}
+        />    
       </SafeAreaView>
     </>
   );
