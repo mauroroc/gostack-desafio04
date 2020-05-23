@@ -1,4 +1,5 @@
 import React, { useEffect, useState} from "react";
+import api from "./services/api";
 
 import {
   SafeAreaView,
@@ -17,9 +18,16 @@ export default function App() {
   }, []);
 
   async function handleLikeRepository(id) {
-    // Implement "Like Repository" functionality
-  }
-
+    const result = await api.post(`repositories/${id}/like`);
+    const newRepos = repos.map((item) => {
+      if(item.id === id) { 
+        return result.data;
+      } else {
+        return item;
+      }
+    });
+    setRepos(newRepos);
+  } 
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="#7159c1" />
@@ -30,14 +38,14 @@ export default function App() {
           keyExtractor={repo => repo.id}
           renderItem={({ item }) => 
           (
+            <>
               <Text style={styles.repository}>{item.title}</Text>
               <View style={styles.techsContainer}>
-                <Text style={styles.tech}>
-                  {item.techs}
+                {item.techs.map((tech) => (
+                  <Text key={tech} style={styles.tech}>
+                  {tech}
                 </Text>
-                <Text style={styles.tech}>
-                {item.techs}
-                </Text>
+                ))}
               </View>
               <View style={styles.likesContainer}>
                 <Text
@@ -47,16 +55,16 @@ export default function App() {
                   {item.likes} curtidas
                 </Text>
               </View>
-
-            <TouchableOpacity
+              <TouchableOpacity
               style={styles.button}
               onPress={() => handleLikeRepository(item.id)}
               testID={`like-button-${item.id}`}
              >
               <Text style={styles.buttonText}>Curtir</Text>
             </TouchableOpacity>
+            </>
           )}
-        />    
+          />          
       </SafeAreaView>
     </>
   );
